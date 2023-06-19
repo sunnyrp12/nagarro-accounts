@@ -5,6 +5,8 @@ import com.example.accounts.dto.StatementDTO;
 import com.example.accounts.entity.Statement;
 import com.example.accounts.repository.StatementRepository;
 import com.example.accounts.service.StatementService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,17 +30,22 @@ public class StatementServiceImpl implements StatementService {
     @Autowired
     private StatementRepository statementRepository;
 
+    private static final Logger logger = LoggerFactory.getLogger(StatementServiceImpl.class);
 
 
     @Override
     public Response getAccountStatement(Integer accountId, Date fromDate, Date toDate, BigDecimal fromAmount, BigDecimal toAmount) {
+        logger.info("Fetching account statement for account ID: {}", accountId);
         List<Statement> statementList = statementRepository.findAllByAccountId(accountId);
         List<StatementDTO> statementDTOList = statementEntityToDTO(statementList);
         List<StatementDTO> filteredStatement = filterStatement(statementDTOList, fromDate, toDate, fromAmount, toAmount);
+        logger.info("Account statement fetch successful");
         return new Response(false, "Statement fetch successful", filteredStatement);
     }
 
+
     private List<StatementDTO> filterStatement(List<StatementDTO> statementDTOList, Date fromDate, Date toDate, BigDecimal fromAmount, BigDecimal toAmount) {
+        logger.info("Enter into Filter statement");
         List<StatementDTO> filteredStatement = new ArrayList<>();
         if (fromDate != null && toDate != null && fromAmount != null && toAmount != null) {
             filteredStatement = statementDTOList.stream().filter(statementDTO ->
@@ -61,6 +68,7 @@ public class StatementServiceImpl implements StatementService {
                     statementDTO.getDatefield().compareTo(threeMonthsAgo) > 0
             ).collect(Collectors.toList());
         }
+        logger.info("Exit from Filter statement");
         return filteredStatement;
     }
 

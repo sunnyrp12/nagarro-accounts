@@ -12,10 +12,9 @@ public class TokenCacheManager {
     private final Cache<String, String> tokenCache;
 
     public TokenCacheManager() {
-        // Initialize the cache with a desired configuration
         tokenCache = Caffeine.newBuilder()
-                .expireAfterWrite(5, TimeUnit.MINUTES) // Token expiration time
-                .maximumSize(1000) // Maximum number of tokens to store
+                .expireAfterWrite(5, TimeUnit.MINUTES)
+                .maximumSize(1000)
                 .build();
     }
 
