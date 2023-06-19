@@ -83,7 +83,7 @@ public class StatementServiceImpl implements StatementService {
                 statementDTO.setDatefield(new SimpleDateFormat("dd.MM.yyyy").parse(statement.getDatefield()));
                 statementDTOList.add(statementDTO);
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getLocalizedMessage());
             }
         });
 
@@ -95,7 +95,7 @@ public class StatementServiceImpl implements StatementService {
             byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
             return bytesToHex(hash);
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            logger.error(e.getLocalizedMessage());
             return null;
         }
     }

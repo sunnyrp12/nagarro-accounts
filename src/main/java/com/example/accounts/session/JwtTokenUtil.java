@@ -16,7 +16,7 @@ import java.util.Map;
 @Component
 public class JwtTokenUtil implements Serializable {
 
-    private static final long EXPIRATION_TIME_MS = 5 * 60 * 1000; // 5 minutes
+    private static final long EXPIRATION_TIME_MS = 5 * 60 * 1000L; // 5 minutes
 
     @Value("${jwt_secret}")
     private String jwtSecret;
