@@ -3,8 +3,6 @@ package com.example.accounts.entity;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
-import java.util.Date;
 
 @Entity
 @Data
