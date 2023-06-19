@@ -2,6 +2,9 @@ package com.example.accounts.session;
 
 import com.example.accounts.entity.User;
 import io.jsonwebtoken.ExpiredJwtException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,10 +27,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
-
-//    UserAuthenticationService userAuthenticationService;
-
     public static Map<String, User> users;
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtTokenFilter.class);
 
     public JwtTokenFilter() {
 
@@ -53,47 +55,25 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         String username = null;
         String token = extractToken(request);
-//        Customer customer= null;
 
         try {
             username = jwtTokenUtil.getUsernameFromToken(token);
-//                if (!jwtTokenUtil.checkAdminFromToken(token)) {
-//                    String username = Integer.valueOf(request.getParameter("username"));
-//                    customer = customerRepository.findByCustomerId(customerId);
-//                }
-
-//                username = jwtTokenUtil.getUsernameFromToken(token);
-
         } catch (IllegalArgumentException e) {
-            System.out.println("Unable to get JWT Token");
+            logger.error("Unable to get JWT Token");
         } catch (ExpiredJwtException e) {
-            System.out.println("JWT Token has expired");
+            logger.error("JWT Token has expired");
         }
 
         if (null != username && SecurityContextHolder.getContext().getAuthentication() == null) {
-            if (jwtTokenUtil.checkAdminFromToken(token)) {
-//                Admin admin = adminRepository.findByEmail(username);
-                User user = users.get(username);
-                if (jwtTokenUtil.validateJwtTokenForAdmin(token, user)) {
-                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                            user, null, new ArrayList<>());
-                    authenticationToken.setDetails(
-                            new WebAuthenticationDetailsSource().buildDetails(request)
-                    );
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                }
+            User user = users.get(username);
+            if (jwtTokenUtil.validateJwtToken(token, user)) {
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                        user, null, new ArrayList<>());
+                authenticationToken.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                );
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
-//            else {
-////                Customer customer = customerRepository.findByEmail(username);
-//                if (jwtTokenUtil.validateJwtToken(token, customer)) {
-//                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-//                            customer, null, new ArrayList<>());
-//                    authenticationToken.setDetails(
-//                            new WebAuthenticationDetailsSource().buildDetails(request)
-//                    );
-//                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-//                }
-//            }
         }
         filterChain.doFilter(request, response);
     }
