@@ -26,6 +26,9 @@ public class StatementController {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
+    @Autowired
+    private JwtTokenFilter jwtTokenFilter;
+
     private static final Logger logger = LoggerFactory.getLogger(StatementController.class);
 
     @GetMapping
@@ -37,7 +40,8 @@ public class StatementController {
         @RequestParam(required = false) BigDecimal toAmount,
         HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         try {
-            String username = jwtTokenUtil.getUsernameFromToken(JwtTokenFilter.extractToken(httpServletRequest));
+            String token = jwtTokenFilter.extractToken(httpServletRequest);
+            String username = jwtTokenUtil.getUsernameFromToken(token);
             logger.info("Received account statement request for accountId: {}", accountId);
             logger.info("Username: {}", username);
 

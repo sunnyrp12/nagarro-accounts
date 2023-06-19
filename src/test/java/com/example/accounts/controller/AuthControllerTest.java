@@ -33,7 +33,7 @@ class AuthControllerTest {
     private AuthController authController;
 
     @Test
-    void testLogin_WithActiveSession() throws IOException {
+    void testLogin_withActiveSession() throws IOException {
         String username = "testUser";
         String password = "testPassword";
         String activeToken = "testToken";
@@ -48,7 +48,7 @@ class AuthControllerTest {
     }
 
     @Test
-    void testLogin_WithoutActiveSession() throws IOException {
+    void testLogin_withoutActiveSession() throws IOException {
         String username = "testUser";
         String password = "testPassword";
         String generatedToken = "testGeneratedToken";
