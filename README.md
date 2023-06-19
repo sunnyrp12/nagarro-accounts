@@ -38,7 +38,7 @@ Follow these steps to run the code and execute tests:
 6. First, Login by using below API with (Admin/User) credentials and you'll get your generated session token
 
    ```bash
-   curl --location --request POST 'localhost:8080/authenticate?username=admin&password=admin'
+   curl --location --request GET 'localhost:8080/authenticate?username=admin&password=admin'
    
 7. Use Generated Token in the `Authorization` as Type `Bearer Token` with below API (Sample Token Attached)
 
