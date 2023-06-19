@@ -8,6 +8,7 @@ public class Response {
 
     @JsonProperty("error_status")
     private boolean errorStatus;
+
     @JsonProperty("message")
     private String message;
 

@@ -1,6 +1,5 @@
 package com.example.accounts;
 
-import com.example.accounts.controller.AccountController;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
