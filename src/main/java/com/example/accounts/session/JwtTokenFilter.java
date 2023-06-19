@@ -1,7 +1,6 @@
 package com.example.accounts.session;
 
 import com.example.accounts.entity.User;
-import com.example.accounts.service.impl.UserAuthenticationService;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
