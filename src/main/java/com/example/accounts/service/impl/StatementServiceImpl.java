@@ -46,7 +46,7 @@ public class StatementServiceImpl implements StatementService {
 
     private List<StatementDTO> filterStatement(List<StatementDTO> statementDTOList, Date fromDate, Date toDate, BigDecimal fromAmount, BigDecimal toAmount) {
         logger.info("Enter into Filter statement");
-        List<StatementDTO> filteredStatement = new ArrayList<>();
+        List<StatementDTO> filteredStatement;
         if (fromDate != null && toDate != null && fromAmount != null && toAmount != null) {
             filteredStatement = statementDTOList.stream().filter(statementDTO ->
                     statementDTO.getDatefield().after(fromDate) && statementDTO.getDatefield().before(toDate)

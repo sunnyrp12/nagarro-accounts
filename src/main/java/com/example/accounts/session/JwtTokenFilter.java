@@ -27,15 +27,16 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
-    public static Map<String, User> users;
+    public static Map<String, User> users = new HashMap<>();
+
+    public static final String ADMIN = "admin";
+    public static final String USER = "user";
 
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenFilter.class);
 
-    public JwtTokenFilter() {
-
-        users = new HashMap<>();
-        users.put("admin", new User("admin", "admin"));
-        users.put("user", new User("user", "user"));
+    private JwtTokenFilter() {
+        users.put(ADMIN, new User(ADMIN, ADMIN));
+        users.put(USER, new User(USER, USER));
 
     }
 
@@ -45,7 +46,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         if (tokenHeader != null && tokenHeader.startsWith("Bearer ")) {
             token = tokenHeader.substring(7);
         } else {
-            System.out.println("Bearer String not found in token");
+            logger.info("Bearer String not found in token");
         }
         return token;
     }
