@@ -78,6 +78,28 @@ class StatementControllerTest {
     }
 
     @Test
+    void getAccountStatement_withException() throws Exception {
+
+        Integer accountId = 123;
+        Date fromDate = new Date();
+        Date toDate = new Date();
+        BigDecimal fromAmount = new BigDecimal("100.00");
+        BigDecimal toAmount = new BigDecimal("200.00");
+
+        when(jwtTokenUtil.getUsernameFromToken(anyString())).thenReturn("admin");
+        when(jwtTokenFilter.extractToken(any())).thenReturn(null);
+
+        when(statementService.getAccountStatement(anyInt(), any(Date.class), any(Date.class), any(BigDecimal.class), any(BigDecimal.class)))
+            .thenReturn(new Response(false, "Success", "Statement"));
+
+        Response response = statementController.getAccountStatement(
+            accountId, fromDate, toDate, fromAmount, toAmount, httpServletRequest, httpServletResponse);
+
+        assertTrue(response.isErrorStatus());
+        assertEquals("Error", response.getMessage());
+    }
+
+    @Test
     void getAccountStatement_withNonAdminUserAndParameters_unauthorizedResponse() throws Exception {
         Integer accountId = 123;
         Date fromDate = new Date();

@@ -49,11 +49,8 @@ public class StatementController {
                 logger.warn("Unauthorized access attempt by user: {}", username);
                 httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
             }
-
-            validateDates(fromDate, toDate);
-            validateAmounts(fromAmount, toAmount);
         } catch (Exception e) {
-            logger.error("Error occurred while processing account statement request", e);
+            logger.error("Error occurred while processing account statement request with Exception -> ", e);
             return new Response(true, "Error", e.getLocalizedMessage());
         }
         logger.info("Account statement generated for accountId: {}", accountId);
@@ -61,16 +58,6 @@ public class StatementController {
     }
 
 
-    private void validateDates(Date fromDate, Date toDate) {
-        if ((fromDate == null && toDate != null) || (fromDate != null && toDate == null)) {
-            throw new IllegalArgumentException("Both fromDate and toDate must be present or both should be null");
-        }
-    }
 
-    private void validateAmounts(BigDecimal fromAmount, BigDecimal toAmount) {
-        if ((fromAmount == null && toAmount != null) || (fromAmount != null && toAmount == null)) {
-            throw new IllegalArgumentException("Both fromAmount and toAmount must be present or both should be null");
-        }
-    }
 
 }

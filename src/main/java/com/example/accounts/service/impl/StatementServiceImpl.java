@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -36,9 +37,23 @@ public class StatementServiceImpl implements StatementService {
     @Override
     public Response getAccountStatement(Integer accountId, Date fromDate, Date toDate, BigDecimal fromAmount, BigDecimal toAmount) {
         logger.info("Fetching account statement for account ID: {}", accountId);
-        List<Statement> statementList = statementRepository.findAllByAccountId(accountId);
-        List<StatementDTO> statementDTOList = statementEntityToDTO(statementList);
-        List<StatementDTO> filteredStatement = filterStatement(statementDTOList, fromDate, toDate, fromAmount, toAmount);
+        List<StatementDTO> filteredStatement;
+        try {
+
+            validateDates(fromDate, toDate);
+            validateAmounts(fromAmount, toAmount);
+
+            List<Statement> statementList = statementRepository.findAllByAccountId(accountId);
+            if (statementList == null || statementList.isEmpty()) {
+                logger.info("No Records found");
+                return new Response(false, "No Records found", new ArrayList<>());
+            }
+            List<StatementDTO> statementDTOList = statementEntityToDTO(statementList);
+            filteredStatement = filterStatement(statementDTOList, fromDate, toDate, fromAmount, toAmount);
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage());
+            return new Response(true, "Statement fetch Failed", null);
+        }
         logger.info("Account statement fetch successful");
         return new Response(false, "Statement fetch successful", filteredStatement);
     }
@@ -47,6 +62,7 @@ public class StatementServiceImpl implements StatementService {
     private List<StatementDTO> filterStatement(List<StatementDTO> statementDTOList, Date fromDate, Date toDate, BigDecimal fromAmount, BigDecimal toAmount) {
         logger.info("Enter into Filter statement");
         List<StatementDTO> filteredStatement;
+
         if (fromDate != null && toDate != null && fromAmount != null && toAmount != null) {
             filteredStatement = statementDTOList.stream().filter(statementDTO ->
                     statementDTO.getDatefield().after(fromDate) && statementDTO.getDatefield().before(toDate)
@@ -72,21 +88,33 @@ public class StatementServiceImpl implements StatementService {
         return filteredStatement;
     }
 
+    private void validateDates(Date fromDate, Date toDate) {
+        if ((fromDate == null && toDate != null) || (fromDate != null && toDate == null)) {
+            throw new IllegalArgumentException("Both fromDate and toDate must be present or both should be null");
+        }
+    }
+
+    private void validateAmounts(BigDecimal fromAmount, BigDecimal toAmount) {
+        if ((fromAmount == null && toAmount != null) || (fromAmount != null && toAmount == null)) {
+            throw new IllegalArgumentException("Both fromAmount and toAmount must be present or both should be null");
+        }
+    }
+
     private List<StatementDTO> statementEntityToDTO(List<Statement> statementList) {
         List<StatementDTO> statementDTOList = new ArrayList<>();
         statementList.forEach(statement -> {
             StatementDTO statementDTO = new StatementDTO();
+            statementDTO.setAccountType(statement.getAccount().getAccountType());
+            statementDTO.setAccountNumber(hashString(statement.getAccount().getAccountNumber()));
+            statementDTO.setAmount(new BigDecimal(statement.getAmount()));
             try {
-                statementDTO.setAccountType(statement.getAccount().getAccountType());
-                statementDTO.setAccountNumber(hashString(statement.getAccount().getAccountNumber()));
-                statementDTO.setAmount(new BigDecimal(statement.getAmount()));
                 statementDTO.setDatefield(new SimpleDateFormat("dd.MM.yyyy").parse(statement.getDatefield()));
-                statementDTOList.add(statementDTO);
-            } catch (Exception e) {
+            } catch (ParseException e) {
                 logger.error(e.getLocalizedMessage());
+                return;
             }
+            statementDTOList.add(statementDTO);
         });
-
         return statementDTOList;
     }
     public static String hashString(String input) {
